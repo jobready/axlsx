@@ -68,7 +68,7 @@ module Axlsx
 
     #def self.parse(input, confirm_valid = false)
     #  p = Package.new
-    #  z = Zip::ZipFile.open(input)
+    #  z = Zip::File.open(input)
     #  p.workbook = Workbook.parse z.get_entry(WORKBOOK_PN)
     #  p
     #end
@@ -98,7 +98,7 @@ module Axlsx
     #   File.open('example_streamed.xlsx', 'w') { |f| f.write(s.read) }
     def serialize(output, confirm_valid=false)
       return false unless !confirm_valid || self.validate.empty?
-      Zip::ZipOutputStream.open(output) do |zip|
+      Zip::OutputStream.open(output) do |zip|
         write_parts(zip)
       end
       true
@@ -110,7 +110,7 @@ module Axlsx
     # @return [StringIO|Boolean] False if confirm_valid and validation errors exist. rewound string IO if not.
     def to_stream(confirm_valid=false)
       return false unless !confirm_valid || self.validate.empty?
-      zip = write_parts(Zip::ZipOutputStream.new("streamed", true))
+      zip = write_parts(Zip::OutputStream.new("streamed", true))
       stream = zip.close_buffer
       stream.rewind
       stream
@@ -150,8 +150,8 @@ module Axlsx
     private
 
     # Writes the package parts to a zip archive.
-    # @param [Zip::ZipOutputStream] zip
-    # @return [Zip::ZipOutputStream]
+    # @param [Zip::OutputStream] zip
+    # @return [Zip::OutputStream]
     def write_parts(zip)
       p = parts
       p.each do |part|
